@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacoco.exec</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.starterjwt.controllers</a> &gt; <span class="el_source">SessionControllerTest.java</span></div><h1>SessionControllerTest.java</h1><pre class="source lang-java linenums">package com.openclassrooms.starterjwt.controllers;
+
+import com.openclassrooms.starterjwt.dto.SessionDto;
+import com.openclassrooms.starterjwt.mapper.SessionMapper;
+import com.openclassrooms.starterjwt.models.Session;
+import com.openclassrooms.starterjwt.services.SessionService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
+<span class="fc" id="L23">class SessionControllerTest {</span>
+
+    @InjectMocks
+    private SessionController sessionController;
+
+    @Mock
+    private SessionService sessionService;
+
+    @Mock
+    private SessionMapper sessionMapper;
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L36">        MockitoAnnotations.openMocks(this);</span>
+<span class="fc" id="L37">    }</span>
+
+    @Test
+    void testFindById_Success() {
+        // Préparation des données
+<span class="fc" id="L42">        Session session = new Session();</span>
+<span class="fc" id="L43">        session.setId(1L);</span>
+<span class="fc" id="L44">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L45">        sessionDto.setId(1L);</span>
+
+<span class="fc" id="L47">        when(sessionService.getById(1L)).thenReturn(session);</span>
+<span class="fc" id="L48">        when(sessionMapper.toDto(session)).thenReturn(sessionDto);</span>
+
+        // Exécution de la méthode
+<span class="fc" id="L51">        ResponseEntity&lt;?&gt; response = sessionController.findById(&quot;1&quot;);</span>
+
+        // Vérification
+<span class="fc" id="L54">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L55">        assertEquals(sessionDto, response.getBody());</span>
+<span class="fc" id="L56">        verify(sessionService, times(1)).getById(1L);</span>
+<span class="fc" id="L57">        verify(sessionMapper, times(1)).toDto(session);</span>
+<span class="fc" id="L58">    }</span>
+
+    @Test
+    void testFindById_NotFound() {
+<span class="fc" id="L62">        when(sessionService.getById(1L)).thenReturn(null);</span>
+
+<span class="fc" id="L64">        ResponseEntity&lt;?&gt; response = sessionController.findById(&quot;1&quot;);</span>
+
+<span class="fc" id="L66">        assertEquals(404, response.getStatusCodeValue());</span>
+<span class="fc" id="L67">        verify(sessionService, times(1)).getById(1L);</span>
+<span class="fc" id="L68">    }</span>
+
+    @Test
+    void testFindById_InvalidId() {
+<span class="fc" id="L72">        ResponseEntity&lt;?&gt; response = sessionController.findById(&quot;invalid&quot;);</span>
+
+<span class="fc" id="L74">        assertEquals(400, response.getStatusCodeValue());</span>
+<span class="fc" id="L75">    }</span>
+
+    @Test
+    void testFindAll() {
+<span class="fc" id="L79">        Session session = new Session();</span>
+<span class="fc" id="L80">        session.setId(1L);</span>
+<span class="fc" id="L81">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L82">        sessionDto.setId(1L);</span>
+
+<span class="fc" id="L84">        when(sessionService.findAll()).thenReturn(Collections.singletonList(session));</span>
+<span class="fc" id="L85">        when(sessionMapper.toDto(any(List.class))).thenReturn(Collections.singletonList(sessionDto));</span>
+
+<span class="fc" id="L87">        ResponseEntity&lt;?&gt; response = sessionController.findAll();</span>
+
+<span class="fc" id="L89">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L90">        List&lt;SessionDto&gt; sessions = (List&lt;SessionDto&gt;) response.getBody();</span>
+<span class="fc" id="L91">        assertNotNull(sessions);</span>
+<span class="fc" id="L92">        assertEquals(1, sessions.size());</span>
+<span class="fc" id="L93">        assertEquals(sessionDto, sessions.get(0));</span>
+
+<span class="fc" id="L95">        verify(sessionService, times(1)).findAll();</span>
+<span class="fc" id="L96">        verify(sessionMapper, times(1)).toDto(any(List.class));</span>
+<span class="fc" id="L97">    }</span>
+
+    @Test
+    void testCreate() {
+<span class="fc" id="L101">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L102">        sessionDto.setId(1L);</span>
+<span class="fc" id="L103">        sessionDto.setName(&quot;Yoga Class&quot;);</span>
+
+<span class="fc" id="L105">        Session session = new Session();</span>
+<span class="fc" id="L106">        session.setId(1L);</span>
+
+<span class="fc" id="L108">        when(sessionMapper.toEntity(sessionDto)).thenReturn(session);</span>
+<span class="fc" id="L109">        when(sessionService.create(session)).thenReturn(session);</span>
+<span class="fc" id="L110">        when(sessionMapper.toDto(session)).thenReturn(sessionDto);</span>
+
+<span class="fc" id="L112">        ResponseEntity&lt;?&gt; response = sessionController.create(sessionDto);</span>
+
+<span class="fc" id="L114">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L115">        assertEquals(sessionDto, response.getBody());</span>
+
+<span class="fc" id="L117">        verify(sessionService, times(1)).create(session);</span>
+<span class="fc" id="L118">        verify(sessionMapper, times(1)).toEntity(sessionDto);</span>
+<span class="fc" id="L119">        verify(sessionMapper, times(1)).toDto(session);</span>
+<span class="fc" id="L120">    }</span>
+
+    @Test
+    void testUpdate_Success() {
+<span class="fc" id="L124">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L125">        sessionDto.setId(1L);</span>
+
+<span class="fc" id="L127">        Session session = new Session();</span>
+<span class="fc" id="L128">        session.setId(1L);</span>
+
+<span class="fc" id="L130">        when(sessionMapper.toEntity(sessionDto)).thenReturn(session);</span>
+<span class="fc" id="L131">        when(sessionService.update(1L, session)).thenReturn(session);</span>
+<span class="fc" id="L132">        when(sessionMapper.toDto(session)).thenReturn(sessionDto);</span>
+
+<span class="fc" id="L134">        ResponseEntity&lt;?&gt; response = sessionController.update(&quot;1&quot;, sessionDto);</span>
+
+<span class="fc" id="L136">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L137">        assertEquals(sessionDto, response.getBody());</span>
+
+<span class="fc" id="L139">        verify(sessionService, times(1)).update(1L, session);</span>
+<span class="fc" id="L140">        verify(sessionMapper, times(1)).toEntity(sessionDto);</span>
+<span class="fc" id="L141">        verify(sessionMapper, times(1)).toDto(session);</span>
+<span class="fc" id="L142">    }</span>
+
+    @Test
+    void testUpdate_InvalidId() {
+<span class="fc" id="L146">        SessionDto sessionDto = new SessionDto();</span>
+
+<span class="fc" id="L148">        ResponseEntity&lt;?&gt; response = sessionController.update(&quot;invalid&quot;, sessionDto);</span>
+
+<span class="fc" id="L150">        assertEquals(400, response.getStatusCodeValue());</span>
+<span class="fc" id="L151">    }</span>
+
+    @Test
+    void testDelete_Success() {
+<span class="fc" id="L155">        Session session = new Session();</span>
+<span class="fc" id="L156">        session.setId(1L);</span>
+
+<span class="fc" id="L158">        when(sessionService.getById(1L)).thenReturn(session);</span>
+
+<span class="fc" id="L160">        ResponseEntity&lt;?&gt; response = sessionController.save(&quot;1&quot;);</span>
+
+<span class="fc" id="L162">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L163">        verify(sessionService, times(1)).getById(1L);</span>
+<span class="fc" id="L164">        verify(sessionService, times(1)).delete(1L);</span>
+<span class="fc" id="L165">    }</span>
+
+    @Test
+    void testDelete_NotFound() {
+<span class="fc" id="L169">        when(sessionService.getById(1L)).thenReturn(null);</span>
+
+<span class="fc" id="L171">        ResponseEntity&lt;?&gt; response = sessionController.save(&quot;1&quot;);</span>
+
+<span class="fc" id="L173">        assertEquals(404, response.getStatusCodeValue());</span>
+<span class="fc" id="L174">        verify(sessionService, times(1)).getById(1L);</span>
+<span class="fc" id="L175">    }</span>
+
+    @Test
+    void testDelete_InvalidId() {
+<span class="fc" id="L179">        ResponseEntity&lt;?&gt; response = sessionController.save(&quot;invalid&quot;);</span>
+
+<span class="fc" id="L181">        assertEquals(400, response.getStatusCodeValue());</span>
+<span class="fc" id="L182">    }</span>
+
+    @Test
+    void testParticipate_Success() {
+<span class="fc" id="L186">        doNothing().when(sessionService).participate(1L, 2L);</span>
+
+<span class="fc" id="L188">        ResponseEntity&lt;?&gt; response = sessionController.participate(&quot;1&quot;, &quot;2&quot;);</span>
+
+<span class="fc" id="L190">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L191">        verify(sessionService, times(1)).participate(1L, 2L);</span>
+<span class="fc" id="L192">    }</span>
+
+    @Test
+    void testParticipate_InvalidId() {
+<span class="fc" id="L196">        ResponseEntity&lt;?&gt; response = sessionController.participate(&quot;invalid&quot;, &quot;2&quot;);</span>
+
+<span class="fc" id="L198">        assertEquals(400, response.getStatusCodeValue());</span>
+<span class="fc" id="L199">    }</span>
+
+    @Test
+    void testNoLongerParticipate_Success() {
+<span class="fc" id="L203">        doNothing().when(sessionService).noLongerParticipate(1L, 2L);</span>
+
+<span class="fc" id="L205">        ResponseEntity&lt;?&gt; response = sessionController.noLongerParticipate(&quot;1&quot;, &quot;2&quot;);</span>
+
+<span class="fc" id="L207">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L208">        verify(sessionService, times(1)).noLongerParticipate(1L, 2L);</span>
+<span class="fc" id="L209">    }</span>
+
+    @Test
+    void testNoLongerParticipate_InvalidId() {
+<span class="fc" id="L213">        ResponseEntity&lt;?&gt; response = sessionController.noLongerParticipate(&quot;invalid&quot;, &quot;2&quot;);</span>
+
+<span class="fc" id="L215">        assertEquals(400, response.getStatusCodeValue());</span>
+<span class="fc" id="L216">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthControllerIntegrationTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacoco.exec</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.starterjwt.integration</a> &gt; <span class="el_source">AuthControllerIntegrationTest.java</span></div><h1>AuthControllerIntegrationTest.java</h1><pre class="source lang-java linenums">package com.openclassrooms.starterjwt.integration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.payload.request.LoginRequest;
+import com.openclassrooms.starterjwt.payload.request.SignupRequest;
+import com.openclassrooms.starterjwt.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+<span class="fc" id="L28">public class AuthControllerIntegrationTest {</span>
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    public void setUp() {
+<span class="fc" id="L47">        userRepository.deleteAll();</span>
+<span class="fc" id="L48">        jdbcTemplate.execute(&quot;DELETE FROM PARTICIPATE&quot;);</span>
+
+<span class="fc" id="L50">    }</span>
+
+    @Test
+    public void testRegisterUser_Success() throws Exception {
+<span class="fc" id="L54">        SignupRequest signupRequest = new SignupRequest();</span>
+<span class="fc" id="L55">        signupRequest.setEmail(&quot;newuser@example.com&quot;);</span>
+<span class="fc" id="L56">        signupRequest.setFirstName(&quot;New&quot;);</span>
+<span class="fc" id="L57">        signupRequest.setLastName(&quot;User&quot;);</span>
+<span class="fc" id="L58">        signupRequest.setPassword(&quot;password123&quot;);</span>
+
+<span class="fc" id="L60">        mockMvc.perform(post(&quot;/api/auth/register&quot;)</span>
+<span class="fc" id="L61">                        .contentType(MediaType.APPLICATION_JSON)</span>
+<span class="fc" id="L62">                        .content(objectMapper.writeValueAsString(signupRequest)))</span>
+<span class="fc" id="L63">                .andExpect(status().isOk())</span>
+<span class="fc" id="L64">                .andExpect(jsonPath(&quot;$.message&quot;, is(&quot;User registered successfully!&quot;)));</span>
+
+        // Verification in DB
+<span class="fc" id="L67">        User registeredUser = userRepository.findByEmail(&quot;newuser@example.com&quot;).orElse(null);</span>
+<span class="fc" id="L68">        assertNotNull(registeredUser, &quot;User should be saved in the database.&quot;);</span>
+<span class="fc" id="L69">    }</span>
+
+    @Test
+    public void testLoginUser_Success() throws Exception {
+<span class="fc" id="L73">        User user = new User(&quot;loginuser@example.com&quot;, &quot;Doe&quot;, &quot;John&quot;, passwordEncoder.encode(&quot;password123&quot;), false);</span>
+<span class="fc" id="L74">        userRepository.save(user);</span>
+
+<span class="fc" id="L76">        LoginRequest loginRequest = new LoginRequest();</span>
+<span class="fc" id="L77">        loginRequest.setEmail(&quot;loginuser@example.com&quot;);</span>
+<span class="fc" id="L78">        loginRequest.setPassword(&quot;password123&quot;);</span>
+
+<span class="fc" id="L80">        mockMvc.perform(post(&quot;/api/auth/login&quot;)</span>
+<span class="fc" id="L81">                        .contentType(MediaType.APPLICATION_JSON)</span>
+<span class="fc" id="L82">                        .content(objectMapper.writeValueAsString(loginRequest)))</span>
+<span class="fc" id="L83">                .andExpect(status().isOk())</span>
+<span class="fc" id="L84">                .andExpect(jsonPath(&quot;$.token&quot;).isNotEmpty())</span>
+<span class="fc" id="L85">                .andExpect(jsonPath(&quot;$.username&quot;, is(&quot;loginuser@example.com&quot;)));</span>
+<span class="fc" id="L86">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

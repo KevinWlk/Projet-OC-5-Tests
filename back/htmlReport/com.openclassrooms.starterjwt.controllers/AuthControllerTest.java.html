@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacoco.exec</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.starterjwt.controllers</a> &gt; <span class="el_source">AuthControllerTest.java</span></div><h1>AuthControllerTest.java</h1><pre class="source lang-java linenums">package com.openclassrooms.starterjwt.controllers;
+
+import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.payload.request.LoginRequest;
+import com.openclassrooms.starterjwt.payload.request.SignupRequest;
+import com.openclassrooms.starterjwt.payload.response.MessageResponse;
+
+import com.openclassrooms.starterjwt.payload.response.JwtResponse;
+import com.openclassrooms.starterjwt.repository.UserRepository;
+import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
+import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
+<span class="fc" id="L30">class AuthControllerTest {</span>
+
+    @InjectMocks
+    private AuthController authController;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private JwtUtils jwtUtils;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private Authentication authentication;
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L52">        MockitoAnnotations.openMocks(this);</span>
+<span class="fc" id="L53">    }</span>
+
+    @Test
+    public void testAuthenticateUser_Success() {
+        // Préparation des données de test pour la requête de connexion
+<span class="fc" id="L58">        LoginRequest loginRequest = new LoginRequest();</span>
+<span class="fc" id="L59">        loginRequest.setEmail(&quot;test@example.com&quot;);</span>
+<span class="fc" id="L60">        loginRequest.setPassword(&quot;password&quot;);</span>
+
+        // Simulation de l'authentification réussie avec un utilisateur admin
+<span class="fc" id="L63">        UserDetailsImpl userDetails = UserDetailsImpl.builder()</span>
+<span class="fc" id="L64">                .id(1L)</span>
+<span class="fc" id="L65">                .username(&quot;test@example.com&quot;)</span>
+<span class="fc" id="L66">                .firstName(&quot;John&quot;)</span>
+<span class="fc" id="L67">                .lastName(&quot;Doe&quot;)</span>
+<span class="fc" id="L68">                .admin(true)</span>
+<span class="fc" id="L69">                .build();</span>
+
+        // Création d'un utilisateur dans le UserRepository avec admin défini à true
+<span class="fc" id="L72">        User mockUser = new User(&quot;test@example.com&quot;, &quot;Doe&quot;, &quot;John&quot;, &quot;encodedPassword&quot;, true);</span>
+<span class="fc" id="L73">        when(userRepository.findByEmail(&quot;test@example.com&quot;)).thenReturn(Optional.of(mockUser));</span>
+
+        // Simulation des interactions de `authenticationManager` et `jwtUtils`
+<span class="fc" id="L76">        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);</span>
+<span class="fc" id="L77">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L78">        SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+
+        // Simuler la génération d'un JWT
+<span class="fc" id="L81">        String token = &quot;mockJwtToken&quot;;</span>
+<span class="fc" id="L82">        when(jwtUtils.generateJwtToken(authentication)).thenReturn(token);</span>
+
+        // Exécution de la méthode à tester
+<span class="fc" id="L85">        ResponseEntity&lt;?&gt; response = authController.authenticateUser(loginRequest);</span>
+
+        // Vérifications sur la réponse
+<span class="fc" id="L88">        assertEquals(200, response.getStatusCodeValue(), &quot;Le statut de la réponse doit être 200&quot;);</span>
+<span class="fc" id="L89">        JwtResponse jwtResponse = (JwtResponse) response.getBody();</span>
+<span class="fc" id="L90">        assertNotNull(jwtResponse, &quot;Le corps de la réponse ne doit pas être null&quot;);</span>
+<span class="fc" id="L91">        assertEquals(&quot;mockJwtToken&quot;, jwtResponse.getToken(), &quot;Le jeton JWT doit correspondre au jeton simulé&quot;);</span>
+<span class="fc" id="L92">        assertEquals(1L, jwtResponse.getId(), &quot;L'ID de l'utilisateur doit être 1&quot;);</span>
+<span class="fc" id="L93">        assertEquals(&quot;test@example.com&quot;, jwtResponse.getUsername(), &quot;Le nom d'utilisateur doit être 'test@example.com'&quot;);</span>
+<span class="fc" id="L94">        assertEquals(&quot;John&quot;, jwtResponse.getFirstName(), &quot;Le prénom doit être 'John'&quot;);</span>
+<span class="fc" id="L95">        assertEquals(&quot;Doe&quot;, jwtResponse.getLastName(), &quot;Le nom doit être 'Doe'&quot;);</span>
+<span class="fc" id="L96">        assertEquals(true, jwtResponse.getAdmin(), &quot;L'utilisateur doit être admin&quot;);</span>
+
+        // Vérifier les appels aux méthodes simulées
+<span class="fc" id="L99">        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));</span>
+<span class="fc" id="L100">        verify(jwtUtils, times(1)).generateJwtToken(authentication);</span>
+<span class="fc" id="L101">        verify(userRepository, times(1)).findByEmail(&quot;test@example.com&quot;);</span>
+<span class="fc" id="L102">    }</span>
+    @Test
+    void testRegisterUser_Success() {
+        // Préparation des données d'entrée pour un utilisateur unique
+<span class="fc" id="L106">        SignupRequest signupRequest = new SignupRequest();</span>
+<span class="fc" id="L107">        signupRequest.setEmail(&quot;newuser@example.com&quot;);</span>
+<span class="fc" id="L108">        signupRequest.setFirstName(&quot;New&quot;);</span>
+<span class="fc" id="L109">        signupRequest.setLastName(&quot;User&quot;);</span>
+<span class="fc" id="L110">        signupRequest.setPassword(&quot;password123&quot;);</span>
+
+        // Simule un nouvel email qui n'existe pas encore dans la base de données
+<span class="fc" id="L113">        when(userRepository.existsByEmail(signupRequest.getEmail())).thenReturn(false);</span>
+<span class="fc" id="L114">        when(passwordEncoder.encode(signupRequest.getPassword())).thenReturn(&quot;encodedPassword&quot;);</span>
+
+        // Appel de la méthode pour créer un utilisateur
+<span class="fc" id="L117">        ResponseEntity&lt;?&gt; response = authController.registerUser(signupRequest);</span>
+
+        // Vérification de la réponse
+<span class="fc" id="L120">        assertEquals(200, response.getStatusCodeValue());</span>
+<span class="fc" id="L121">        assertEquals(&quot;User registered successfully!&quot;, ((MessageResponse) response.getBody()).getMessage());</span>
+
+        // Vérifie que le mot de passe est bien encodé et que l'utilisateur est sauvegardé
+<span class="fc" id="L124">        verify(passwordEncoder, times(1)).encode(signupRequest.getPassword());</span>
+<span class="fc" id="L125">        verify(userRepository, times(1)).save(any(User.class));</span>
+<span class="fc" id="L126">    }</span>
+
+    @Test
+    void testRegisterUser_EmailAlreadyExists() {
+        // Préparation des données pour un utilisateur existant
+<span class="fc" id="L131">        SignupRequest signupRequest = new SignupRequest();</span>
+<span class="fc" id="L132">        signupRequest.setEmail(&quot;existinguser@example.com&quot;);</span>
+<span class="fc" id="L133">        signupRequest.setFirstName(&quot;Existing&quot;);</span>
+<span class="fc" id="L134">        signupRequest.setLastName(&quot;User&quot;);</span>
+<span class="fc" id="L135">        signupRequest.setPassword(&quot;password123&quot;);</span>
+
+        // Simule un email qui existe déjà dans la base de données
+<span class="fc" id="L138">        when(userRepository.existsByEmail(signupRequest.getEmail())).thenReturn(true);</span>
+
+        // Appel de la méthode
+<span class="fc" id="L141">        ResponseEntity&lt;?&gt; response = authController.registerUser(signupRequest);</span>
+
+        // Vérification de la réponse
+<span class="fc" id="L144">        assertEquals(400, response.getStatusCodeValue());</span>
+<span class="fc" id="L145">        assertEquals(&quot;Error: Email is already taken!&quot;, ((MessageResponse) response.getBody()).getMessage());</span>
+
+        // Vérifie que l'utilisateur n'est pas sauvegardé
+<span class="fc" id="L148">        verify(userRepository, never()).save(any(User.class));</span>
+<span class="fc" id="L149">        verify(passwordEncoder, never()).encode(anyString());</span>
+<span class="fc" id="L150">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

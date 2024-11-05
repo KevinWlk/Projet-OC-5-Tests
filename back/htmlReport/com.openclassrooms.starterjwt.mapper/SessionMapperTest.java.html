@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SessionMapperTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacoco.exec</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.starterjwt.mapper</a> &gt; <span class="el_source">SessionMapperTest.java</span></div><h1>SessionMapperTest.java</h1><pre class="source lang-java linenums">package com.openclassrooms.starterjwt.mapper;
+
+import com.openclassrooms.starterjwt.dto.SessionDto;
+import com.openclassrooms.starterjwt.models.Session;
+import com.openclassrooms.starterjwt.models.Teacher;
+import com.openclassrooms.starterjwt.models.User;
+import com.openclassrooms.starterjwt.services.TeacherService;
+import com.openclassrooms.starterjwt.services.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+@SpringBootTest
+<span class="fc" id="L24">public class SessionMapperTest {</span>
+
+    @Autowired
+    private SessionMapper sessionMapper;
+
+    @MockBean
+    private TeacherService teacherService;
+
+    @MockBean
+    private UserService userService;
+
+    @BeforeEach
+    public void setUp() {
+        // Réinitialise les mocks avant chaque test pour garantir l'indépendance des tests
+<span class="fc" id="L38">        reset(teacherService, userService);</span>
+<span class="fc" id="L39">    }</span>
+
+    @Test
+    public void testToEntityWithNoTeacherAndNoUsers() {
+        // Teste le mappage d'un DTO sans professeur ni utilisateurs
+<span class="fc" id="L44">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L45">        sessionDto.setDescription(&quot;Session vide&quot;);</span>
+
+<span class="fc" id="L47">        Session session = sessionMapper.toEntity(sessionDto);</span>
+
+        // Vérifie que la description est bien mappée et que le professeur et la liste d'utilisateurs sont vides
+<span class="fc" id="L50">        assertEquals(&quot;Session vide&quot;, session.getDescription());</span>
+<span class="fc" id="L51">        assertEquals(null, session.getTeacher());</span>
+<span class="fc" id="L52">        assertEquals(0, session.getUsers().size());</span>
+<span class="fc" id="L53">    }</span>
+
+    @Test
+    public void testToDtoWithNoTeacherAndNoUsers() {
+        // Teste le mappage d'une entité sans professeur ni utilisateurs
+<span class="fc" id="L58">        Session session = new Session();</span>
+<span class="fc" id="L59">        session.setDescription(&quot;Session vide&quot;);</span>
+
+<span class="fc" id="L61">        SessionDto sessionDto = sessionMapper.toDto(session);</span>
+
+        // Vérifie que la description est bien mappée et que l'ID du professeur et la liste d'ID d'utilisateurs sont vides
+<span class="fc" id="L64">        assertEquals(&quot;Session vide&quot;, sessionDto.getDescription());</span>
+<span class="fc" id="L65">        assertEquals(null, sessionDto.getTeacher_id());</span>
+<span class="fc" id="L66">        assertEquals(0, sessionDto.getUsers().size());</span>
+<span class="fc" id="L67">    }</span>
+
+    @Test
+    public void testToEntityWithMultipleUsers() {
+        // Prépare un DTO avec plusieurs utilisateurs
+<span class="fc" id="L72">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L73">        sessionDto.setDescription(&quot;Cours de magie&quot;);</span>
+<span class="fc" id="L74">        sessionDto.setUsers(Arrays.asList(2L, 3L));</span>
+
+        // Simule la récupération des utilisateurs par leurs IDs
+<span class="fc" id="L77">        User user1 = new User();</span>
+<span class="fc" id="L78">        user1.setId(2L);</span>
+<span class="fc" id="L79">        User user2 = new User();</span>
+<span class="fc" id="L80">        user2.setId(3L);</span>
+
+<span class="fc" id="L82">        when(userService.findById(2L)).thenReturn(user1);</span>
+<span class="fc" id="L83">        when(userService.findById(3L)).thenReturn(user2);</span>
+
+        // Convertit le DTO en entité
+<span class="fc" id="L86">        Session session = sessionMapper.toEntity(sessionDto);</span>
+
+        // Vérifie que les utilisateurs ont été correctement mappés
+<span class="fc" id="L89">        assertEquals(2, session.getUsers().size());</span>
+<span class="fc" id="L90">        assertEquals(2L, session.getUsers().get(0).getId());</span>
+<span class="fc" id="L91">        assertEquals(3L, session.getUsers().get(1).getId());</span>
+<span class="fc" id="L92">    }</span>
+
+    @Test
+    public void testToDtoWithMultipleUsers() {
+        // Prépare une entité avec plusieurs utilisateurs
+<span class="fc" id="L97">        Session session = new Session();</span>
+<span class="fc" id="L98">        session.setDescription(&quot;Cours de potions&quot;);</span>
+
+<span class="fc" id="L100">        User user1 = new User();</span>
+<span class="fc" id="L101">        user1.setId(2L);</span>
+<span class="fc" id="L102">        User user2 = new User();</span>
+<span class="fc" id="L103">        user2.setId(3L);</span>
+
+<span class="fc" id="L105">        session.setUsers(Arrays.asList(user1, user2));</span>
+
+        // Convertit l'entité en DTO
+<span class="fc" id="L108">        SessionDto sessionDto = sessionMapper.toDto(session);</span>
+
+        // Vérifie que les utilisateurs ont été correctement mappés par leurs IDs
+<span class="fc" id="L111">        assertEquals(2, sessionDto.getUsers().size());</span>
+<span class="fc" id="L112">        assertEquals(2L, sessionDto.getUsers().get(0));</span>
+<span class="fc" id="L113">        assertEquals(3L, sessionDto.getUsers().get(1));</span>
+<span class="fc" id="L114">    }</span>
+
+    @Test
+    public void testToEntityList() {
+        // Prépare une liste de DTO avec un seul élément de test
+<span class="fc" id="L119">        SessionDto sessionDto = new SessionDto();</span>
+<span class="fc" id="L120">        sessionDto.setDescription(&quot;Cours de botanique&quot;);</span>
+<span class="fc" id="L121">        sessionDto.setUsers(Collections.singletonList(4L));</span>
+
+<span class="fc" id="L123">        List&lt;SessionDto&gt; dtoList = Collections.singletonList(sessionDto);</span>
+
+        // Simule la récupération de l'utilisateur par son ID
+<span class="fc" id="L126">        User user = new User();</span>
+<span class="fc" id="L127">        user.setId(4L);</span>
+<span class="fc" id="L128">        when(userService.findById(4L)).thenReturn(user);</span>
+
+        // Convertit la liste de DTO en liste d'entités
+<span class="fc" id="L131">        List&lt;Session&gt; sessionList = sessionMapper.toEntity(dtoList);</span>
+
+<span class="fc" id="L133">        assertEquals(1, sessionList.size());</span>
+<span class="fc" id="L134">        assertEquals(&quot;Cours de botanique&quot;, sessionList.get(0).getDescription());</span>
+<span class="fc" id="L135">        assertEquals(4L, sessionList.get(0).getUsers().get(0).getId());</span>
+<span class="fc" id="L136">    }</span>
+
+    @Test
+    public void testToDtoList() {
+        // Prépare une liste d'entités avec une seule entité de test
+<span class="fc" id="L141">        Session session = new Session();</span>
+<span class="fc" id="L142">        session.setDescription(&quot;Défense contre les forces du mal&quot;);</span>
+
+<span class="fc" id="L144">        User user = new User();</span>
+<span class="fc" id="L145">        user.setId(5L);</span>
+<span class="fc" id="L146">        session.setUsers(Collections.singletonList(user));</span>
+
+<span class="fc" id="L148">        List&lt;Session&gt; sessionList = Collections.singletonList(session);</span>
+
+        // Convertit la liste d'entités en liste de DTO
+<span class="fc" id="L151">        List&lt;SessionDto&gt; dtoList = sessionMapper.toDto(sessionList);</span>
+
+<span class="fc" id="L153">        assertEquals(1, dtoList.size());</span>
+<span class="fc" id="L154">        assertEquals(&quot;Défense contre les forces du mal&quot;, dtoList.get(0).getDescription());</span>
+<span class="fc" id="L155">        assertEquals(5L, dtoList.get(0).getUsers().get(0));</span>
+<span class="fc" id="L156">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

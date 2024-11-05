@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntityMapperTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacoco.exec</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.starterjwt.mapper</a> &gt; <span class="el_source">EntityMapperTest.java</span></div><h1>EntityMapperTest.java</h1><pre class="source lang-java linenums">package com.openclassrooms.starterjwt.mapper;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+<span class="fc" id="L12">class EntityMapperTest {</span>
+
+    // Crée une instance de TestEntityMapper, notre implémentation de EntityMapper utilisée pour les tests
+    private TestEntityMapper testEntityMapper;
+
+    // Avant chaque test, initialise testEntityMapper avec une nouvelle instance
+    @BeforeEach
+    public void setUp() {
+<span class="fc" id="L20">        testEntityMapper = new TestEntityMapper();</span>
+<span class="fc" id="L21">    }</span>
+
+    @Test
+    public void testToEntity() {
+        // Prépare un objet DTO de test avec un identifiant et un nom &quot;Harry Potter&quot;
+<span class="fc" id="L26">        TestDto dto = new TestDto(1, &quot;Harry Potter&quot;);</span>
+
+        // Appelle la méthode toEntity pour convertir le DTO en entité
+<span class="fc" id="L29">        TestEntity entity = testEntityMapper.toEntity(dto);</span>
+
+        // Vérifie que l'entité résultante a le même identifiant et nom que le DTO d'origine
+<span class="fc" id="L32">        assertEquals(dto.getId(), entity.getId());</span>
+<span class="fc" id="L33">        assertEquals(dto.getName(), entity.getName());</span>
+<span class="fc" id="L34">    }</span>
+
+    @Test
+    public void testToDto() {
+        // Prépare une entité de test avec un identifiant et un nom &quot;Hermione Granger&quot;
+<span class="fc" id="L39">        TestEntity entity = new TestEntity(1, &quot;Hermione Granger&quot;);</span>
+
+        // Appelle la méthode toDto pour convertir l'entité en DTO
+<span class="fc" id="L42">        TestDto dto = testEntityMapper.toDto(entity);</span>
+
+        // Vérifie que le DTO résultant a le même identifiant et nom que l'entité d'origine
+<span class="fc" id="L45">        assertEquals(entity.getId(), dto.getId());</span>
+<span class="fc" id="L46">        assertEquals(entity.getName(), dto.getName());</span>
+<span class="fc" id="L47">    }</span>
+
+    @Test
+    public void testToEntityList() {
+        // Prépare une liste de DTO avec les personnages &quot;Ron Weasley&quot; et &quot;Albus Dumbledore&quot;
+<span class="fc" id="L52">        List&lt;TestDto&gt; dtoList = Arrays.asList(new TestDto(1, &quot;Ron Weasley&quot;), new TestDto(2, &quot;Albus Dumbledore&quot;));</span>
+
+        // Appelle la méthode toEntity pour convertir la liste de DTO en une liste d'entités
+<span class="fc" id="L55">        List&lt;TestEntity&gt; entityList = testEntityMapper.toEntity(dtoList);</span>
+
+        // Vérifie que la liste d'entités a la même taille que la liste de DTO
+<span class="fc" id="L58">        assertEquals(2, entityList.size());</span>
+        // Vérifie que les noms des entités correspondent aux noms des DTO d'origine
+<span class="fc" id="L60">        assertEquals(&quot;Ron Weasley&quot;, entityList.get(0).getName());</span>
+<span class="fc" id="L61">        assertEquals(&quot;Albus Dumbledore&quot;, entityList.get(1).getName());</span>
+<span class="fc" id="L62">    }</span>
+
+    @Test
+    public void testToDtoList() {
+        // Prépare une liste d'entités avec les personnages &quot;Severus Rogue&quot; et &quot;Rubeus Hagrid&quot;
+<span class="fc" id="L67">        List&lt;TestEntity&gt; entityList = Arrays.asList(new TestEntity(1, &quot;Severus Rogue&quot;), new TestEntity(2, &quot;Rubeus Hagrid&quot;));</span>
+
+        // Appelle la méthode toDto pour convertir la liste d'entités en une liste de DTO
+<span class="fc" id="L70">        List&lt;TestDto&gt; dtoList = testEntityMapper.toDto(entityList);</span>
+
+        // Vérifie que la liste de DTO a la même taille que la liste d'entités
+<span class="fc" id="L73">        assertEquals(2, dtoList.size());</span>
+        // Vérifie que les noms des DTO correspondent aux noms des entités d'origine
+<span class="fc" id="L75">        assertEquals(&quot;Severus Rogue&quot;, dtoList.get(0).getName());</span>
+<span class="fc" id="L76">        assertEquals(&quot;Rubeus Hagrid&quot;, dtoList.get(1).getName());</span>
+<span class="fc" id="L77">    }</span>
+
+    // Classe de test fictive implémentant EntityMapper pour tester ses méthodes
+    private static class TestEntityMapper implements EntityMapper&lt;TestDto, TestEntity&gt; {
+
+        @Override
+        public TestEntity toEntity(TestDto dto) {
+            // Convertit un TestDto en TestEntity
+<span class="fc" id="L85">            return new TestEntity(dto.getId(), dto.getName());</span>
+        }
+
+        @Override
+        public TestDto toDto(TestEntity entity) {
+            // Convertit un TestEntity en TestDto
+<span class="fc" id="L91">            return new TestDto(entity.getId(), entity.getName());</span>
+        }
+
+        @Override
+        public List&lt;TestEntity&gt; toEntity(List&lt;TestDto&gt; dtoList) {
+            // Convertit une liste de TestDto en liste de TestEntity
+<span class="fc" id="L97">            return dtoList.stream().map(this::toEntity).collect(Collectors.toList());</span>
+        }
+
+        @Override
+        public List&lt;TestDto&gt; toDto(List&lt;TestEntity&gt; entityList) {
+            // Convertit une liste de TestEntity en liste de TestDto
+<span class="fc" id="L103">            return entityList.stream().map(this::toDto).collect(Collectors.toList());</span>
+        }
+    }
+
+    // Classe DTO de test représentant un personnage
+    private static class TestDto {
+        private final int id;
+        private final String name;
+
+<span class="fc" id="L112">        public TestDto(int id, String name) {</span>
+<span class="fc" id="L113">            this.id = id;</span>
+<span class="fc" id="L114">            this.name = name;</span>
+<span class="fc" id="L115">        }</span>
+
+        public int getId() {
+<span class="fc" id="L118">            return id;</span>
+        }
+
+        public String getName() {
+<span class="fc" id="L122">            return name;</span>
+        }
+    }
+
+    // Classe Entité de test représentant un personnage
+    private static class TestEntity {
+        private final int id;
+        private final String name;
+
+<span class="fc" id="L131">        public TestEntity(int id, String name) {</span>
+<span class="fc" id="L132">            this.id = id;</span>
+<span class="fc" id="L133">            this.name = name;</span>
+<span class="fc" id="L134">        }</span>
+
+        public int getId() {
+<span class="fc" id="L137">            return id;</span>
+        }
+
+        public String getName() {
+<span class="fc" id="L141">            return name;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
