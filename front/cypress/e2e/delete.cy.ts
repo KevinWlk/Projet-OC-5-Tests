@@ -91,7 +91,7 @@ describe("Supprimer une session", () => {
     cy.intercept("GET", `/api/teacher/${session.teacher_id}`, enseignant);
 
     // Navigation vers les détails de la session
-    cy.contains('Détail').click();
+    cy.contains('Detail').click();
     cy.url().should("include", `/sessions/detail/${session.id}`);
 
     // Mock de la suppression
@@ -104,7 +104,7 @@ describe("Supprimer une session", () => {
     });
 
     // Suppression de la session
-    cy.contains("Supprimer").click();
+    cy.contains("Delete").click();
 
     // Vérification du retour à la liste des sessions
     cy.url().should("include", "/sessions");
