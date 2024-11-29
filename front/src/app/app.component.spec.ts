@@ -2,10 +2,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterTestingModule } from '@angular/router/testing';
-import { expect } from '@jest/globals';
+import { expect, jest } from '@jest/globals';
 
 import { AppComponent } from './app.component';
-
+import { AuthService } from './features/auth/services/auth.service';
+import { SessionService } from './services/session.service';
+import { SessionInformation } from './interfaces/sessionInformation.interface';
+import { BehaviorSubject } from 'rxjs';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -13,10 +16,10 @@ describe('AppComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientModule,
-        MatToolbarModule
+        MatToolbarModule,
       ],
       declarations: [
-        AppComponent
+        AppComponent,
       ],
     }).compileComponents();
   });
@@ -25,5 +28,43 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
+  });
+
+  describe("Logout", () => {
+    // Ajouter des paramètres de constructeur pour AppComponent, les clés d'objet représentent les méthodes des services
+    let mockAuthService: any = jest.fn();
+    let mockRouter: any = { navigate: jest.fn() };
+    let mockSessionService: any = { logOut: jest.fn() };
+
+    let mockComponent: AppComponent = new AppComponent(
+      mockAuthService as AuthService,
+      mockRouter,
+      mockSessionService as SessionService,
+    );
+
+    it("Logout successfully", () => {
+      let isLogged: boolean = true;
+      let sessionInformation: SessionInformation | undefined;
+      let isLoggedSubject = new BehaviorSubject<boolean>(isLogged);
+
+      // Appeler la méthode logout
+      mockComponent.logout();
+
+      // Vérifie que la méthode logOut de session.service.ts a été appelée une fois
+      expect(mockSessionService.logOut).toHaveBeenCalledTimes(1);
+
+      // Mock de la méthode logOut avec des données actualisées
+      mockSessionService.logOut.mockImplementation(() => {
+        sessionInformation = undefined;
+        isLogged = false;
+        isLoggedSubject.next(isLogged);
+      });
+
+      // Vérifie que la navigation a été appelée une fois
+      expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+
+      // Vérifie que la navigation redirige correctement
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['']);
+    });
   });
 });

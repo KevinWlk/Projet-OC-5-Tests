@@ -24,7 +24,7 @@ describe('FormComponent', () => {
   let fixture: ComponentFixture<FormComponent>;
 
 
-// Ajouter les paramètres du constructeur du composant formulaire (mocks), les clés des objets représentent les méthodes des services
+// Ajouter les paramètres du constructeur du composant formulaire, les clés des objets représentent les méthodes des services
   let mockComponent: FormComponent;
 
   let mockRoute: any = { snapshot: { paramMap: { get: jest.fn() } } };
@@ -34,7 +34,6 @@ describe('FormComponent', () => {
     create: jest.fn().mockReturnValue({subscribe: jest.fn()}),
     update: jest.fn().mockReturnValue(of({})),
   };
-  //let mockSessionService: any;
   let mockTeacherService: any = {all : jest.fn()};
   let mockRouter: any = {
     navigate: jest.fn(),
@@ -112,11 +111,11 @@ describe('FormComponent', () => {
       mockComponent.onUpdate = false;
       mockComponent.submit();
 
-      // Appeler le service sessionApiService avec les données de la requête de session
+      // Appel du service sessionApiService avec données de la requête de session
       expect(mockSessionApiService.create).toHaveBeenCalledTimes(1);
       expect(mockSessionApiService.create).toHaveBeenCalledWith(form);
 
-      // Simuler l'abonnement (mock subscribe)
+      // Simuler l'abonnement
       mockSessionApiService.create.mockReturnValue(of(
         mockMatSnackBar.open("Session created !"),
         mockRouter.navigate(['sessions'])
@@ -195,11 +194,11 @@ describe('FormComponent', () => {
 
   describe("When I don't fill fields correctly in session update form", () => {
     it("Update fails, invalid fields", () => {
-      // Mock id to update
+
       const idNumber: number = 1;
       const id : string | undefined = mockRoute.snapshot.paramMap.get(idNumber.toString());
 
-      // Invalid session request
+      // Données de requête de session invalides
       const sessionReq : Session = {
         id:0,
         name: '',
