@@ -6,7 +6,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Git clone:
 
-> git clone https://github.com/OpenClassrooms-Student-Center/P5-Full-Stack-testing
+> git clone https://github.com/KevinWlk/Projet-OC-5-Tests.git
 
 Go inside folder:
 
@@ -22,8 +22,6 @@ Launch Front-end:
 
 
 ## Ressources
-
-### Mockoon env 
 
 ### Postman collection
 
@@ -67,6 +65,8 @@ Launching test:
 
 > npm run test
 
-for following change:
+to open coverage-report:
 
-> npm run test:watch
+> open coverage/lcov-report/index.html in your browser
+
+
