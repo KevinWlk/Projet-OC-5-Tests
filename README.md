@@ -34,6 +34,9 @@ git clone https://github.com/KevinWlk/Projet-OC-5-Tests.git
    ```bash
    npm run start
    ```
+   Le serveur sera disponible par défaut sur http://localhost:4200.
+
+
 
 ---
 
@@ -65,6 +68,8 @@ git clone https://github.com/KevinWlk/Projet-OC-5-Tests.git
    ```bash
    mvn spring-boot:run
    ```
+Le serveur sera disponible par défaut sur http://localhost:8080.
+
 
 ---
 
@@ -91,11 +96,15 @@ git clone https://github.com/KevinWlk/Projet-OC-5-Tests.git
      ```bash
      npm run test:coverage
      ```
-
+Ouvrir le rapport de coverage dans un navigateur : coverage/icov-report/index.html
    - Lancer les tests avec Cypress :
      ```bash
      npm run e2e
      ```
+   - Ne pas oublier de kill le processus avant l'étape suivante : ctrl + c.
+
+
+   - 
      Pour obtenir un rapport de couverture des tests :
      ```bash
      npm run e2e:coverage
@@ -129,3 +138,6 @@ git clone https://github.com/KevinWlk/Projet-OC-5-Tests.git
    ```bash
    mvn jacoco:report
    ```
+- Le rapport sera disponible dans le dossier target/site/jacoco :
+  - Ouvrir le index.html dans un navigateur.
+
