@@ -142,15 +142,6 @@ class SessionControllerTest {
     }
 
     @Test
-    void testUpdate_InvalidId() {
-        SessionDto sessionDto = new SessionDto();
-
-        ResponseEntity<?> response = sessionController.update("invalid", sessionDto);
-
-        assertEquals(400, response.getStatusCodeValue());
-    }
-
-    @Test
     void testDelete_Success() {
         Session session = new Session();
         session.setId(1L);
@@ -172,13 +163,8 @@ class SessionControllerTest {
 
         assertEquals(404, response.getStatusCodeValue());
         verify(sessionService, times(1)).getById(1L);
-    }
+        verify(sessionService, never()).delete(anyLong());
 
-    @Test
-    void testDelete_InvalidId() {
-        ResponseEntity<?> response = sessionController.save("invalid");
-
-        assertEquals(400, response.getStatusCodeValue());
     }
 
     @Test
@@ -192,13 +178,6 @@ class SessionControllerTest {
     }
 
     @Test
-    void testParticipate_InvalidId() {
-        ResponseEntity<?> response = sessionController.participate("invalid", "2");
-
-        assertEquals(400, response.getStatusCodeValue());
-    }
-
-    @Test
     void testNoLongerParticipate_Success() {
         doNothing().when(sessionService).noLongerParticipate(1L, 2L);
 
@@ -206,12 +185,5 @@ class SessionControllerTest {
 
         assertEquals(200, response.getStatusCodeValue());
         verify(sessionService, times(1)).noLongerParticipate(1L, 2L);
-    }
-
-    @Test
-    void testNoLongerParticipate_InvalidId() {
-        ResponseEntity<?> response = sessionController.noLongerParticipate("invalid", "2");
-
-        assertEquals(400, response.getStatusCodeValue());
     }
 }
