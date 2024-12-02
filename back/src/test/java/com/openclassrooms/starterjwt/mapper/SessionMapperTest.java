@@ -34,7 +34,7 @@ public class SessionMapperTest {
 
     @BeforeEach
     public void setUp() {
-        // Réinitialise les mocks avant chaque test pour garantir l'indépendance des tests
+        // Réinitialise les mocks avant chaque test
         reset(teacherService, userService);
     }
 

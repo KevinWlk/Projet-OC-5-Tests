@@ -79,12 +79,12 @@ public class SessionControllerIntegrationTest {
         Session session = new Session();
         session.setName("Yoga Session");
         session.setTeacher(savedTeacher);
-        session.setDescription("This is a yoga session description."); // Fournir une valeur pour 'description'
+        session.setDescription("This is a yoga session description.");
 
         // Utiliser java.util.Date pour la date
         Calendar calendar = Calendar.getInstance();
         calendar.set(2024, Calendar.NOVEMBER, 10, 10, 0);
-        session.setDate(calendar.getTime()); // Assurez-vous que le type de `date` est bien java.util.Date
+        session.setDate(calendar.getTime());
 
         Session savedSession = sessionRepository.save(session);
         this.createdSessionId = savedSession.getId(); // Sauvegarder l'ID pour le test

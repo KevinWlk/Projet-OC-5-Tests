@@ -43,7 +43,6 @@ public class AuthTokenFilterIntegrationTest {
                 .password("password")
                 .build();
 
-        // Créer l'objet Authentication avec UserDetailsImpl comme principal
         Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
 
         // Générer un JWT valide avec l'objet Authentication correct
@@ -52,7 +51,7 @@ public class AuthTokenFilterIntegrationTest {
 
     @Test
     public void whenValidJwt_thenAuthorized() throws Exception {
-        mockMvc.perform(get("/api/session") // Remplacez par une ressource protégée valide
+        mockMvc.perform(get("/api/session")
                         .header("Authorization", "Bearer " + validJwt)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

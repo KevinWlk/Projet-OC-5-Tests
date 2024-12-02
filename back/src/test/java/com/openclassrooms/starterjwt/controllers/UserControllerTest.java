@@ -49,8 +49,8 @@ public class UserControllerTest {
         User user = new User();
         user.setId(1L);
 
-        UserDto userDto = new UserDto();  // Assurez-vous que ce type correspond à votre DTO réel
-        userDto.setId(1L);  // Définir les propriétés nécessaires sur userDto
+        UserDto userDto = new UserDto();
+        userDto.setId(1L);
 
         when(userService.findById(1L)).thenReturn(user);
         when(userMapper.toDto(user)).thenReturn(userDto);
@@ -58,7 +58,7 @@ public class UserControllerTest {
         ResponseEntity<?> response = userController.findById("1");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(userDto, response.getBody());  // Vérifie que le body est bien le DTO attendu
+        assertEquals(userDto, response.getBody());
         verify(userMapper, times(1)).toDto(user);
     }
 

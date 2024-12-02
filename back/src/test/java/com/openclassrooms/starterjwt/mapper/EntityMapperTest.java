@@ -48,30 +48,24 @@ class EntityMapperTest {
 
     @Test
     public void testToEntityList() {
-        // Prépare une liste de DTO avec les personnages "Ron Weasley" et "Albus Dumbledore"
         List<TestDto> dtoList = Arrays.asList(new TestDto(1, "Ron Weasley"), new TestDto(2, "Albus Dumbledore"));
 
-        // Appelle la méthode toEntity pour convertir la liste de DTO en une liste d'entités
         List<TestEntity> entityList = testEntityMapper.toEntity(dtoList);
 
-        // Vérifie que la liste d'entités a la même taille que la liste de DTO
         assertEquals(2, entityList.size());
-        // Vérifie que les noms des entités correspondent aux noms des DTO d'origine
+
         assertEquals("Ron Weasley", entityList.get(0).getName());
         assertEquals("Albus Dumbledore", entityList.get(1).getName());
     }
 
     @Test
     public void testToDtoList() {
-        // Prépare une liste d'entités avec les personnages "Severus Rogue" et "Rubeus Hagrid"
         List<TestEntity> entityList = Arrays.asList(new TestEntity(1, "Severus Rogue"), new TestEntity(2, "Rubeus Hagrid"));
 
-        // Appelle la méthode toDto pour convertir la liste d'entités en une liste de DTO
         List<TestDto> dtoList = testEntityMapper.toDto(entityList);
 
-        // Vérifie que la liste de DTO a la même taille que la liste d'entités
         assertEquals(2, dtoList.size());
-        // Vérifie que les noms des DTO correspondent aux noms des entités d'origine
+
         assertEquals("Severus Rogue", dtoList.get(0).getName());
         assertEquals("Rubeus Hagrid", dtoList.get(1).getName());
     }
