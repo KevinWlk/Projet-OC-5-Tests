@@ -17,7 +17,6 @@ describe('DetailComponent', () => {
   let fixture: ComponentFixture<DetailComponent>;
   let service: SessionService;
 
-  // Ajouter des paramètres de constructeur pour DetailComponent, les clés d'objet représentent les méthodes des services
   let mockRoute: any = { snapshot: { paramMap: { get: jest.fn().mockReturnValue('123') }} };
   let mockFormBuilder: FormBuilder = new FormBuilder();
   const mockSessionService = {

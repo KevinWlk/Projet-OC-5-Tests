@@ -31,11 +31,11 @@ describe('AppComponent', () => {
   });
 
   describe("Logout", () => {
-    // Ajouter des paramètres de constructeur pour AppComponent, les clés d'objet représentent les méthodes des services
-    let mockAuthService: any = jest.fn();
-    let mockRouter: any = { navigate: jest.fn() };
-    let mockSessionService: any = { logOut: jest.fn() };
 
+    let mockAuthService: any = jest.fn(); //créer une fonction mockée pour simuler les services
+    let mockRouter: any = { navigate: jest.fn() }; //Simule la méthode de navigation du routeur Angular
+    let mockSessionService: any = { logOut: jest.fn() }; // Simule la méthode de déco
+//Crée une instance de AppComponent en passant les services mockés.
     let mockComponent: AppComponent = new AppComponent(
       mockAuthService as AuthService,
       mockRouter,
